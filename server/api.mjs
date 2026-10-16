@@ -199,13 +199,15 @@ async function analyze(req, res) {
 export function apiMiddleware() {
   return async (req, res, next) => {
     const url = (req.url || '').split('?')[0]
-    if (!url.startsWith('/api/')) return next()
+    // match /api/... at the end of the path so the app also works behind a proxy prefix (e.g. Domino Apps)
+    const m = url.match(/\/api\/(health|analyze)$/)
+    if (!m) return next()
     try {
-      if (url === '/api/health' && req.method === 'GET') {
+      if (m[1] === 'health' && req.method === 'GET') {
         const cfg = loadConfig()
         return json(res, 200, { ai: !!cfg.apiKey, model: cfg.model, keySource: cfg.keySource })
       }
-      if (url === '/api/analyze' && req.method === 'POST') return await analyze(req, res)
+      if (m[1] === 'analyze' && req.method === 'POST') return await analyze(req, res)
       json(res, 404, { error: 'Not found' })
     } catch (e) {
       if (!res.headersSent) json(res, 500, { error: String(e.message || e) })

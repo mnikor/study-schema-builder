@@ -25,9 +25,10 @@ Turn a study synopsis or protocol into clean, editable, one-page **study design 
 4. [Using the app](#using-the-app)
 5. [Running locally](#running-locally)
 6. [Deployment (GitHub Pages)](#deployment-github-pages)
-7. [Project structure](#project-structure)
-8. [Limitations](#limitations)
-9. [References](#references)
+7. [Running on Domino](#running-on-domino)
+8. [Project structure](#project-structure)
+9. [Limitations](#limitations)
+10. [References](#references)
 
 ---
 
@@ -362,6 +363,7 @@ AI configuration (kept on the server, never sent to the browser):
 | `STUDIO_AI_MODEL` | Model name (default `gpt-5.4`) |
 | `STUDIO_ENV_FILE` | Path to an alternative env file |
 | `PORT` | Port for `npm start` (default 5181) |
+| `HOST` | Interface for `npm start` (default `127.0.0.1`; `0.0.0.0` in containers such as Domino) |
 
 `.env.local` is git-ignored. Without a key, the app still offers offline drafts, templates, editing and all exports, and visitors can use their own key.
 
@@ -378,10 +380,55 @@ GitHub Pages hosts static files only, so the `/api` server doesn't run there. Th
 
 ---
 
+## Running on Domino
+
+The repository is ready to run as a **Domino App**:
+
+- `app.sh` (repo root) installs dependencies, builds, and serves the app on **`0.0.0.0:8888`**, the address Domino Apps expect.
+- Asset and API paths are relative, and the server ignores any leading URL prefix, so the app works behind Domino's app proxy (`/<user>/<project>/r/...`).
+- The OpenAI key stays server-side: set **`OPENAI_API_KEY`** (and optionally `STUDIO_AI_MODEL`) as a Domino environment variable (user- or project-level). Never commit it.
+
+### 1. Git credentials (only if needed)
+
+This repository is public, so Domino can **import and pull it without credentials**. Add a credential only if Domino should **push changes back** to GitHub, or if the repository becomes private.
+
+**Create a fine-grained token on GitHub** (*Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token*):
+
+| Setting | Value |
+| --- | --- |
+| Name | `Domino – study-schema-builder` |
+| Expiration | e.g. 90 days (rotate regularly) |
+| Repository access | **Only select repositories** → `study-schema-builder` |
+| Permissions | **Contents: Read and write** (or *Read-only* if Domino only pulls); *Metadata: Read* is added automatically |
+
+Copy the token once; GitHub won't show it again.
+
+**Add it to Domino**: open your user menu → **Account Settings** → **Git Credentials** → add a credential for **github.com**, type **Personal Access Token (HTTPS)**, username `mnikor`, and paste the token. (Labels can differ slightly between Domino versions.)
+
+### 2. Create the project from the repository
+
+In Domino, create a **new project** backed by Git (*Git-based project* / *import a Git repository*), using
+`https://github.com/mnikor/study-schema-builder.git`. Select the credential from step 1 if you added one.
+
+### 3. Compute environment
+
+The app needs **Node.js 20 or newer**. If your Domino environment doesn't include it, add it to the environment's Dockerfile instructions, for example:
+
+```dockerfile
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt-get install -y nodejs
+```
+
+### 4. Publish the app
+
+Set `OPENAI_API_KEY` as an environment variable (project settings or account settings), then publish the app from the project (*Deployments → App* or *Publish → App*, depending on the Domino version). Domino runs `app.sh` and shows the app at its app URL. Without a key, the app still runs with offline drafts, templates, editing and exports.
+
+---
+
 ## Project structure
 
 ```text
 schema-builder/
+├─ app.sh                   # Domino App entry point (build + serve on 0.0.0.0:8888)
 ├─ index.html
 ├─ vite.config.ts            # dev server + local API middleware, Pages base path
 ├─ shared/

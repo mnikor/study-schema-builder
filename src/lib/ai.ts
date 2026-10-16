@@ -11,7 +11,7 @@ export interface Health {
 
 export async function health(): Promise<Health> {
   try {
-    const r = await fetch('/api/health')
+    const r = await fetch('api/health')
     if (!r.ok) throw new Error()
     return await r.json()
   } catch {
@@ -145,7 +145,7 @@ async function analyzeDirect(input: AnalyzeInput, k: UserKey, onProgress: (p: Pr
 
 export async function analyzeWithAI(input: AnalyzeInput, onProgress: (p: Progress) => void, signal?: AbortSignal, userKey?: UserKey) {
   if (userKey?.key) return analyzeDirect(input, userKey, onProgress, signal)
-  const r = await fetch('/api/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input), signal })
+  const r = await fetch('api/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input), signal })
   if (!r.ok || !r.body) {
     let msg = `Request failed (${r.status})`
     try {
