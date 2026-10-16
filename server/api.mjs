@@ -42,6 +42,7 @@ export function loadConfig() {
   return {
     apiKey: process.env.OPENAI_API_KEY || fileEnv.OPENAI_API_KEY || '',
     model: process.env.STUDIO_AI_MODEL || fileEnv.STUDIO_AI_MODEL || 'gpt-5.4',
+    baseUrl: (process.env.OPENAI_BASE_URL || fileEnv.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/+$/, ''),
     keySource: process.env.OPENAI_API_KEY ? 'environment' : source,
   }
 }
@@ -117,7 +118,7 @@ async function analyze(req, res) {
       stream: true,
     }
     send({ type: 'progress', stage: 'sending', elapsed: 0, model: cfg.model })
-    const upstream = await fetch('https://api.openai.com/v1/responses', {
+    const upstream = await fetch(`${cfg.baseUrl}/responses`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${cfg.apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

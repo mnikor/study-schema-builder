@@ -364,6 +364,7 @@ AI configuration (kept on the server, never sent to the browser):
 | `STUDIO_ENV_FILE` | Path to an alternative env file |
 | `PORT` | Port for `npm start` (default 5181) |
 | `HOST` | Interface for `npm start` (default `127.0.0.1`; `0.0.0.0` in containers such as Domino) |
+| `OPENAI_BASE_URL` | Optional OpenAI-compatible endpoint (default `https://api.openai.com/v1`) |
 
 `.env.local` is git-ignored. Without a key, the app still offers offline drafts, templates, editing and all exports, and visitors can use their own key.
 
@@ -382,11 +383,21 @@ GitHub Pages hosts static files only, so the `/api` server doesn't run there. Th
 
 ## Running on Domino
 
-The repository is ready to run as a **Domino App**:
+The repository is ready to run as a **Domino App**, including Domino's standard environment, which has no Node.js:
 
-- `app.sh` (repo root) installs dependencies, builds, and serves the app on **`0.0.0.0:8888`**, the address Domino Apps expect.
-- Asset and API paths are relative, and the server ignores any leading URL prefix, so the app works behind Domino's app proxy (`/<user>/<project>/r/...`).
-- The OpenAI key stays server-side: set **`OPENAI_API_KEY`** (and optionally `STUDIO_AI_MODEL`) as a Domino environment variable (user- or project-level). Never commit it.
+- `app.sh` (repo root) starts **`server/serve.py`** on **`0.0.0.0:8888`**, the address Domino Apps expect. The server uses only the Python standard library and serves the **prebuilt app in `domino/app/`**, so start-up needs no Node.js, npm or package downloads.
+- It provides the same API as the Node server (`/api/health`, streamed `/api/analyze`), with the same AI instructions and output schema (`domino/app/prompt.json`, exported from `shared/prompt.mjs`).
+- Asset and API paths are relative, and both servers ignore any leading URL prefix, so the app works behind Domino's app proxy (`/<user>/<project>/r/...`).
+
+| Environment variable | Purpose |
+| --- | --- |
+| `OPENAI_API_KEY` | OpenAI key for AI analysis (kept server-side; never commit it) |
+| `STUDIO_AI_MODEL` | Optional model name (default `gpt-5.4`) |
+| `OPENAI_BASE_URL` | Optional OpenAI-compatible endpoint, e.g. a corporate gateway (default `https://api.openai.com/v1`) |
+| `HTTPS_PROXY` | Optional outbound proxy, if your network requires one |
+| `SSB_BUILD=1` | Optional: build from source with Node.js 20+ instead of using the prebuilt app |
+
+**Keeping the prebuilt app current:** after changing the source, run `npm run build:domino` and commit `domino/app/`. Domino serves whatever is committed there.
 
 ### 1. Git credentials (only if needed)
 
@@ -418,15 +429,15 @@ In Domino, create a **new project** backed by Git (*Git-based project* / *import
 
 ### 3. Compute environment
 
-The app needs **Node.js 20 or newer**. If your Domino environment doesn't include it, add it to the environment's Dockerfile instructions, for example:
-
-```dockerfile
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt-get install -y nodejs
-```
+Any environment with **Python 3.8+** works, including the Domino Standard Environment. Node.js is needed only if you set `SSB_BUILD=1`. Note that software installed inside a running workspace doesn't carry over to apps; apps start from the environment image.
 
 ### 4. Publish the app
 
-Set `OPENAI_API_KEY` as an environment variable (project settings or account settings), then publish the app from the project (*Deployments → App* or *Publish → App*, depending on the Domino version). Domino runs `app.sh` and shows the app at its app URL. Without a key, the app still runs with offline drafts, templates, editing and exports.
+1. Add `OPENAI_API_KEY` under **Project settings → Hardware & Environment → Environment variables** (or under your account's user environment variables, to keep it personal).
+2. Publish the app (*Deployments → Apps & Agents → Publish*). Choose **`/mnt/code`** and the file **`app.sh`**, keep the default branch, and pick a hardware tier (`general.medium` is enough).
+3. Open the app. The left panel shows "AI: OpenAI …" when the key is picked up. Without a key, the app still runs with offline drafts, templates, editing and exports.
+
+If the app doesn't start, open its logs in Domino. A line such as `Could not reach https://api.openai.com/v1` means the network blocks OpenAI; set `OPENAI_BASE_URL` (corporate gateway) or `HTTPS_PROXY`.
 
 ---
 
@@ -434,7 +445,8 @@ Set `OPENAI_API_KEY` as an environment variable (project settings or account set
 
 ```text
 schema-builder/
-├─ app.sh                   # Domino App entry point (build + serve on 0.0.0.0:8888)
+├─ app.sh                   # Domino App entry point (Python server on 0.0.0.0:8888)
+├─ domino/app/              # prebuilt app + prompt.json served on Domino (npm run build:domino)
 ├─ index.html
 ├─ vite.config.ts            # dev server + local API middleware, Pages base path
 ├─ shared/
@@ -442,7 +454,8 @@ schema-builder/
 │  └─ prompt.mjs (+ .d.mts)  # AI instructions + strict JSON schema (server and browser)
 ├─ server/
 │  ├─ api.mjs                # /api/health, /api/analyze (OpenAI, streamed NDJSON)
-│  └─ serve.mjs              # production static server + API
+│  ├─ serve.mjs              # production static server + API (Node)
+│  └─ serve.py               # same server in pure Python (Domino, no Node.js)
 ├─ src/
 │  ├─ types.ts               # StudyModel, Diagram, nodes, edges, timeline types
 │  ├─ store.ts               # zustand store: project, undo/redo, layout actions, autosave
