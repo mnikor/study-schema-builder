@@ -1,0 +1,89 @@
+{
+  "studyTypes": [
+    "rct-parallel",
+    "rct-crossover",
+    "rct-factorial",
+    "single-arm",
+    "dose-escalation",
+    "platform",
+    "cohort-prospective",
+    "cohort-retrospective",
+    "case-control",
+    "cross-sectional",
+    "registry",
+    "external-control",
+    "target-trial-emulation",
+    "treatment-patterns",
+    "diagnostic-accuracy",
+    "systematic-review",
+    "consensus-delphi"
+  ],
+  "guidelines": [
+    "spirit",
+    "consort",
+    "ich-m11",
+    "trend",
+    "strobe",
+    "record",
+    "record-pe",
+    "harper",
+    "design-diagram",
+    "stard",
+    "prisma",
+    "accord"
+  ],
+  "layouts": [
+    "schema",
+    "flow",
+    "lines",
+    "windows",
+    "timeline"
+  ],
+  "periodKinds": [
+    "screening",
+    "run-in",
+    "baseline",
+    "lookback",
+    "treatment",
+    "washout",
+    "maintenance",
+    "observation",
+    "follow-up",
+    "extension",
+    "other"
+  ],
+  "armKinds": [
+    "experimental",
+    "active-control",
+    "placebo",
+    "standard-of-care",
+    "no-intervention",
+    "exposure",
+    "comparator",
+    "cohort",
+    "other"
+  ],
+  "windowKinds": [
+    "washout",
+    "exclusion",
+    "covariate",
+    "exposure",
+    "outcome",
+    "follow-up",
+    "enrollment",
+    "other"
+  ],
+  "segmentKinds": [
+    "active",
+    "placebo",
+    "control",
+    "off",
+    "other"
+  ],
+  "timeUnits": [
+    "days",
+    "weeks",
+    "months",
+    "years"
+  ]
+}
