@@ -392,23 +392,29 @@ The repository is ready to run as a **Domino App**:
 
 This repository is public, so Domino can **import and pull it without credentials**. Add a credential only if Domino should **push changes back** to GitHub, or if the repository becomes private.
 
-**Create a fine-grained token on GitHub** (*Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token*):
+**Create a classic personal access token on GitHub.** Domino's Git integration works most reliably with classic tokens:
 
-| Setting | Value |
+1. Open https://github.com/settings/tokens/new?scopes=repo&description=Domino%20study-schema-builder (this pre-fills the note and the `repo` scope).
+2. Choose an expiration (e.g. 90 days) and click **Generate token**.
+3. Copy the token (starts with `ghp_`). GitHub shows it only once.
+
+A classic token with `repo` scope can access all repositories you can access. Give it an expiry, keep it only in Domino, and revoke it at https://github.com/settings/tokens if it leaks.
+
+**Add it to Domino**: open your user menu → **Account Settings** → **Git Credentials** → **Add credential**:
+
+| Field | Value |
 | --- | --- |
-| Name | `Domino – study-schema-builder` |
-| Expiration | e.g. 90 days (rotate regularly) |
-| Repository access | **Only select repositories** → `study-schema-builder` |
-| Permissions | **Contents: Read and write** (or *Read-only* if Domino only pulls); *Metadata: Read* is added automatically |
+| Domain / Git service | `github.com` |
+| Credential type | **Personal Access Token** (HTTPS) |
+| Username | `mnikor` |
+| Token | the `ghp_…` token |
 
-Copy the token once; GitHub won't show it again.
-
-**Add it to Domino**: open your user menu → **Account Settings** → **Git Credentials** → add a credential for **github.com**, type **Personal Access Token (HTTPS)**, username `mnikor`, and paste the token. (Labels can differ slightly between Domino versions.)
+Labels can differ slightly between Domino versions. Use the **HTTPS** repository URL with this credential (not the `git@github.com:` SSH form).
 
 ### 2. Create the project from the repository
 
 In Domino, create a **new project** backed by Git (*Git-based project* / *import a Git repository*), using
-`https://github.com/mnikor/study-schema-builder.git`. Select the credential from step 1 if you added one.
+`https://github.com/mnikor/study-schema-builder.git`, and select the credential from step 1. For an existing project, open the project's Git repository settings and switch it to the new credential.
 
 ### 3. Compute environment
 
