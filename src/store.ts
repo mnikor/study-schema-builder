@@ -41,7 +41,8 @@ interface State {
   redo: () => void
 
   setActive: (id: string) => void
-  relayout: (id?: string) => Promise<void>
+  /** history: false when the change that triggered it already created the undo step (spec R-STATE-1). */
+  relayout: (id?: string, opts?: { history?: boolean }) => Promise<void>
   relayoutAll: () => Promise<void>
   resize: (id?: string) => void
   setDirection: (dir: Direction) => Promise<void>
@@ -89,6 +90,12 @@ function withoutRemovedPages(p: Project): Project {
   const diagrams = p.diagrams.filter((d) => known.has(d.layout))
   if (!diagrams.length) return projectFromModel(p.model, p.source)
   return { ...p, diagrams, activeId: diagrams.some((d) => d.id === p.activeId) ? p.activeId : diagrams[0].id }
+}
+
+/** Page-level choices a rebuild keeps (spec: docs/layout-behaviour-spec.md, R-REBUILD). */
+function keepPageChoices(old: Diagram): Partial<Diagram['settings']> {
+  const s = old.settings
+  return { fontSize: s.fontSize, page: s.page, rows: s.rows, orientation: s.orientation, lockDirection: s.lockDirection }
 }
 
 export const needsLayout = (d: Diagram) => d.nodes.length > 0 && d.nodes.every((n) => n.position.x === 0 && n.position.y === 0 && !n.width)
@@ -146,12 +153,12 @@ export const useStore = create<State>((set, get) => ({
 
   setActive: (id) => set((s) => ({ project: { ...s.project, activeId: id }, selectedBand: null, editingNode: null, fitNonce: s.fitNonce + 1 })),
 
-  relayout: async (id) => {
+  relayout: async (id, opts) => {
     const p = get().project
     const d = p.diagrams.find((x) => x.id === (id ?? p.activeId))
     if (!d) return
     const next = await layoutDiagram(d, themeById(p.themeId))
-    get().updateDiagram(() => next, 'layout', d.id)
+    get().updateDiagram(() => next, opts?.history === false ? false : 'layout', d.id)
     set((s) => ({ fitNonce: s.fitNonce + 1 }))
   },
 
@@ -238,7 +245,7 @@ export const useStore = create<State>((set, get) => ({
     const keep: Diagram = {
       ...fresh,
       id: old.id,
-      settings: layout && layout !== old.layout ? fresh.settings : { ...fresh.settings, fontSize: old.settings.fontSize, page: old.settings.page, bandStyle: old.settings.bandStyle, showTitle: old.settings.showTitle },
+      settings: layout && layout !== old.layout ? { ...fresh.settings, ...keepPageChoices(old) } : { ...fresh.settings, ...keepPageChoices(old), bandStyle: old.settings.bandStyle, showTitle: old.settings.showTitle },
     }
     const d = await layoutDiagram(keep, themeById(p.themeId))
     get().updateDiagram(() => d, 'regen', old.id)
@@ -251,7 +258,7 @@ export const useStore = create<State>((set, get) => ({
     const diagrams = await Promise.all(
       p.diagrams.map(async (old) => {
         const fresh = generateDiagram(p.model, old.layout, old.direction)
-        return layoutDiagram({ ...fresh, id: old.id, settings: { ...fresh.settings, fontSize: old.settings.fontSize, page: old.settings.page } }, theme)
+        return layoutDiagram({ ...fresh, id: old.id, settings: { ...fresh.settings, ...keepPageChoices(old) } }, theme)
       }),
     )
     get().update((pp) => ({ ...pp, diagrams }), 'rebuild')

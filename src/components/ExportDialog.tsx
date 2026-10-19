@@ -100,7 +100,7 @@ export function ExportDialog() {
                     value={d.settings.orientation ?? 'auto'}
                     onChange={(v) => {
                       updateDiagram((dd) => ({ ...dd, settings: { ...dd.settings, orientation: v, lockDirection: false } }), 'orient')
-                      relayout()
+                      relayout(undefined, { history: false })
                     }}
                     options={[{ value: 'auto', label: 'Auto' }, { value: 'portrait', label: 'Portrait' }, { value: 'landscape', label: 'Landscape' }]}
                   />
@@ -110,7 +110,7 @@ export function ExportDialog() {
                     value={fmt === 'docx' ? pageId : d.settings.page}
                     onChange={(v) => {
                       updateDiagram((dd) => ({ ...dd, settings: { ...dd.settings, page: v } }), 'page')
-                      relayout()
+                      relayout(undefined, { history: false })
                     }}
                     options={fmt === 'docx' ? pageOptions : [{ value: 'auto', label: fmt === 'pptx' && orient === 'landscape' ? 'Auto (slide 16:9)' : 'Auto (A4)' }, ...pageOptions]}
                   />

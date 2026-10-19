@@ -75,10 +75,6 @@ interface Cand {
 
 const bodyPt = (d: Diagram, s: number) => Math.round((((d.settings.fontSize - 1) * s * 72) / 25.4) * 10) / 10
 
-/**
- * Prefer portrait whenever body text stays readable (≥ 8 pt) or portrait prints about as large;
- * otherwise landscape. Within an orientation, prefer fewer rows when they print nearly as large.
- */
 /** Largest print; among near-equal options (within 7%) the one with fewest rows. */
 function bestOf(xs: Cand[]): Cand | null {
   if (!xs.length) return null

@@ -33,7 +33,7 @@ function useDebouncedRelayout() {
   const t = useRef<ReturnType<typeof setTimeout>>(undefined)
   return () => {
     clearTimeout(t.current)
-    t.current = setTimeout(() => useStore.getState().relayout(), 280)
+    t.current = setTimeout(() => useStore.getState().relayout(undefined, { history: false }), 280)
   }
 }
 
@@ -490,15 +490,15 @@ function PageInspector({ d }: { d: Diagram }) {
           />
         </Field>
         {(d.layout === 'schema' || d.layout === 'flow' || d.layout === 'lines') && (
-          <Field label={d.direction === 'LR' ? 'Rows' : 'Columns'} hint="Auto wraps long chains into 2–3 rows when that prints larger.">
+          <Field label={d.direction === 'LR' ? 'Rows' : 'Columns'} hint="Auto keeps one row when it prints at 9 pt or more, otherwise wraps into up to 4.">
             <Segmented
               value={String(d.settings.rows ?? 0)}
               onChange={(v) => setS({ rows: Number(v) }, 'rows', true)}
-              options={[{ value: '0', label: 'Auto' }, { value: '1', label: '1' }, { value: '2', label: '2' }, { value: '3', label: '3' }]}
+              options={[{ value: '0', label: 'Auto' }, { value: '1', label: '1' }, { value: '2', label: '2' }, { value: '3', label: '3' }, { value: '4', label: '4' }]}
             />
           </Field>
         )}
-        <Field label="Page" hint="Auto prefers portrait when text stays readable, otherwise landscape.">
+        <Field label="Page" hint="Auto: landscape for horizontal flows, portrait for vertical ones. Choosing a page lets the flow direction adapt to it.">
           <Segmented
             value={d.settings.orientation ?? 'auto'}
             onChange={(v) => setS({ orientation: v, lockDirection: false }, 'orient', true)}
@@ -615,11 +615,11 @@ export function Inspector() {
       ) : n.type === 'marker' ? (
         <Section title={tl ? 'Milestone line' : 'Index date marker'}>
           <Field label="Label">
-            <Text value={n.data.label} onChange={(v) => { patchData([n.id], { label: v }, 'mlabel'); useStore.getState().relayout() }} />
+            <Text value={n.data.label} onChange={(v) => { patchData([n.id], { label: v }, 'mlabel'); useStore.getState().relayout(undefined, { history: false }) }} />
           </Field>
           {tl && (
             <Field label={`Time (${d.timeline?.unit ?? 'weeks'})`}>
-              <Num value={n.data.t0 ?? null} onChange={(v) => { if (v !== null) { patchData([n.id], { t0: v }, 'mt0'); useStore.getState().relayout() } }} />
+              <Num value={n.data.t0 ?? null} onChange={(v) => { if (v !== null) { patchData([n.id], { t0: v }, 'mt0'); useStore.getState().relayout(undefined, { history: false }) } }} />
             </Field>
           )}
           <Field label="Line colour">
