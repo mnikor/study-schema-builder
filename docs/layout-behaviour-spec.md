@@ -1,6 +1,9 @@
 # Layout behaviour specification
 
-How Study Schema Builder decides **flow direction, page orientation, rows and positions**, and what happens when the user changes any of them. It's written for frontend developers re-implementing or extending the canvas, and for testers.
+How the current prototype decides **flow direction, page orientation, rows and positions**, and what happens when the user changes any of them.
+
+> **Reference implementation, not the requirements.** The requirements, scenarios and priorities are in [`requirements.md`](requirements.md). This document records one way of meeting them: the prototype's actual behaviour, useful as a worked example and for regression testing of the prototype. Algorithms, thresholds and visual devices here are implementation choices that may be replaced, provided requirements R1–R18 are met. In this document, "must" describes how the prototype behaves.
+
 
 - **Status:** describes the behaviour of `main` as of October 2026.
 - **Normative language:** *must* = required behaviour; *should* = intended default that may be tuned.

@@ -272,7 +272,7 @@ flowchart TD
     F --> KEEP
 ```
 
-The complete rules (every trigger, threshold, what survives each action, and acceptance tests) are in **[docs/layout-behaviour-spec.md](docs/layout-behaviour-spec.md)**.
+What the layout must achieve (scenarios, prioritised requirements, open decisions) is in **[docs/requirements.md](docs/requirements.md)**. How this prototype achieves it (every trigger, threshold, what survives each action, and acceptance tests) is in **[docs/layout-behaviour-spec.md](docs/layout-behaviour-spec.md)**.
 
 So **the flow direction and the page always agree**: a horizontal figure is never squeezed into stacked rows on a portrait page unless you ask for that combination explicitly. **Fit to page** additionally tries several box widths and spacings and keeps the best result.
 
@@ -479,7 +479,8 @@ schema-builder/
 │  ├─ components/            # top bar, page tabs, study panel, inspector, checks, dialogs
 │  └─ export/                # scene, SVG, PNG, PowerPoint, Word
 ├─ docs/
-│  ├─ layout-behaviour-spec.md # rules for direction, page, rows, triggers + acceptance tests
+│  ├─ requirements.md        # scenarios, prioritised requirements, open decisions
+│  ├─ layout-behaviour-spec.md # prototype's rules (reference implementation) + tests
 │  └─ images/                # gallery images used in this README
 └─ .github/workflows/deploy.yml
 ```
