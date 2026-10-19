@@ -2,7 +2,7 @@
 
 How the current prototype decides **flow direction, page orientation, rows and positions**, and what happens when the user changes any of them.
 
-> **Reference implementation, not the requirements.** The requirements, scenarios and priorities are in [`requirements.md`](requirements.md). This document records one way of meeting them: the prototype's actual behaviour, useful as a worked example and for regression testing of the prototype. Algorithms, thresholds and visual devices here are implementation choices that may be replaced, provided requirements R1–R18 are met. In this document, "must" describes how the prototype behaves.
+> **Reference implementation, not the requirements.** The requirements, user cases and priorities for the Study Schema tab in Evidence CoPilot are in [`requirements.md`](requirements.md). This document records one way of meeting the figure requirements (R1–R18): the prototype's actual behaviour, useful as a worked example and for regression testing of the prototype. Algorithms, thresholds and visual devices here are implementation choices that may be replaced. In this document, "must" describes how the prototype behaves.
 
 
 - **Status:** describes the behaviour of `main` as of October 2026.

@@ -272,7 +272,7 @@ flowchart TD
     F --> KEEP
 ```
 
-What the layout must achieve (scenarios, prioritised requirements, open decisions) is in **[docs/requirements.md](docs/requirements.md)**. How this prototype achieves it (every trigger, threshold, what survives each action, and acceptance tests) is in **[docs/layout-behaviour-spec.md](docs/layout-behaviour-spec.md)**.
+What the Study Schema tab must achieve inside Evidence CoPilot (real-life user cases in Study Synopsis & PED and Protocol Development, prioritised requirements, open decisions) is in **[docs/requirements.md](docs/requirements.md)**. How this prototype achieves it (every trigger, threshold, what survives each action, and acceptance tests) is in **[docs/layout-behaviour-spec.md](docs/layout-behaviour-spec.md)**.
 
 So **the flow direction and the page always agree**: a horizontal figure is never squeezed into stacked rows on a portrait page unless you ask for that combination explicitly. **Fit to page** additionally tries several box widths and spacings and keeps the best result.
 
@@ -479,7 +479,7 @@ schema-builder/
 │  ├─ components/            # top bar, page tabs, study panel, inspector, checks, dialogs
 │  └─ export/                # scene, SVG, PNG, PowerPoint, Word
 ├─ docs/
-│  ├─ requirements.md        # scenarios, prioritised requirements, open decisions
+│  ├─ requirements.md        # Evidence CoPilot user cases, prioritised requirements, open decisions
 │  ├─ layout-behaviour-spec.md # prototype's rules (reference implementation) + tests
 │  └─ images/                # gallery images used in this README
 └─ .github/workflows/deploy.yml
